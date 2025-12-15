@@ -17,9 +17,9 @@ typedef enum colors {
 void neopixel_init();
 
 /*
- * @breif set pixel color and brightness
- * @param uint8_t pixel_num: ID of pixel to set (0-6 for NPG-LITE)
- * @param color_t color (sets hue corrosponding to color and saturation to 100)
+ * @brief set pixel color and brightness
+ * @param uint8_t pixel_num: ID of pixel to set (0-5 for NPG-LITE)
+ * @param color_t color (sets hue corresponding to color and saturation to 100)
  * @param uint8_t brightness: brightness of pixel (0-100)
  * @return void
  */

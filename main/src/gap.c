@@ -128,6 +128,7 @@ static int gap_event_handler(struct ble_gap_event *event, void *arg) {
                  rc);
         return rc;
       }
+      set_pixel(0, GREEN, 10);
       conn_handle = event->connect.conn_handle;
       print_conn_desc(&desc);
       struct ble_gap_upd_params params = {.itvl_min = desc.conn_itvl,
@@ -145,7 +146,6 @@ static int gap_event_handler(struct ble_gap_event *event, void *arg) {
       // Restart advertising on error
       start_advertising();
     }
-    set_pixel(0, GREEN, 10);
     return rc;
   case BLE_GAP_EVENT_DISCONNECT:
     set_pixel(0, RED, 10);

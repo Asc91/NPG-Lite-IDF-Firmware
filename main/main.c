@@ -183,10 +183,13 @@ void battery_check(int battery_reading) {
 
         /* Linear interpolation */
         percent = (uint8_t)(p1 + (voltage - v1) * (p2 - p1) / (v2 - v1));
+        break;
       }
     }
   }
   if (percent < 5) {
+    // To Do: change to heartbeat
+    set_pixel(5, RED, 10);
     nimble_port_stop(); // stop ble
     adc_continuous_stop(adc_handle);
     ESP_LOGE("NPG-IDF", "Low Battery, please charge device before use");

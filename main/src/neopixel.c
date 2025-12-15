@@ -68,12 +68,7 @@ void led_strip_hsv2rgb(uint32_t h, uint32_t s, uint32_t v, uint32_t *r,
 uint32_t color_r = 0;
 uint32_t color_g = 0;
 uint32_t color_b = 0;
-uint16_t color_h = 0;
-uint16_t color_s = 100;
-uint16_t color_v = 10;
-uint16_t start_rgb = 0;
 
-rmt_tx_channel_config_t tx_chan_config;
 rmt_channel_handle_t led_chan = NULL;
 rmt_encoder_handle_t led_encoder = NULL;
 
@@ -104,6 +99,10 @@ void neopixel_init() {
 }
 
 void set_pixel(uint8_t pixel_num, color_t color, uint8_t brightness) {
+  if (pixel_num > NUM_NEOPIXEL - 1 || pixel_num < 0) {
+    ESP_LOGE(TAG, "Pixel Num should be between 0 to 5 for NPG-LITE!");
+    return;
+  }
   led_strip_hsv2rgb(color, 100, brightness, &color_r, &color_g, &color_b);
   pixels[pixel_num * 3 + 0] = color_g;
   pixels[pixel_num * 3 + 1] = color_b;
