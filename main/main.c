@@ -27,6 +27,7 @@
 #include "gatt.h"
 #include "hal/adc_types.h"
 #include "hal/gpio_types.h"
+#include "neopixel.h"
 #include "soc/soc_caps.h"
 #include <stdint.h>
 
@@ -167,21 +168,22 @@ void battery_check(int battery_reading) {
   ESP_LOGI("NPG-IDF", "vol bat: %f", voltage);
 #endif
   uint8_t percent = 0;
-  if (voltage < batt_table[0].voltage)
+  if (voltage < batt_table[0].voltage) {
     percent = batt_table[0].percent;
-  if (voltage > batt_table[batt_table_len - 1].voltage)
+  } else if (voltage > batt_table[batt_table_len - 1].voltage) {
     percent = batt_table[batt_table_len - 1].percent;
+  } else {
+    for (int i = 0; i < batt_table_len - 1; i++) {
+      float v1 = batt_table[i].voltage;
+      float v2 = batt_table[i + 1].voltage;
 
-  for (int i = 0; i < batt_table_len - 1; i++) {
-    float v1 = batt_table[i].voltage;
-    float v2 = batt_table[i + 1].voltage;
+      if (voltage >= v1 && voltage <= v2) {
+        uint8_t p1 = batt_table[i].percent;
+        uint8_t p2 = batt_table[i + 1].percent;
 
-    if (voltage >= v1 && voltage <= v2) {
-      uint8_t p1 = batt_table[i].percent;
-      uint8_t p2 = batt_table[i + 1].percent;
-
-      /* Linear interpolation */
-      percent = (uint8_t)(p1 + (voltage - v1) * (p2 - p1) / (v2 - v1));
+        /* Linear interpolation */
+        percent = (uint8_t)(p1 + (voltage - v1) * (p2 - p1) / (v2 - v1));
+      }
     }
   }
   if (percent < 5) {
@@ -215,6 +217,7 @@ adc_conv_task(void *arg) { // changed signature to proper FreeRTOS prototype
                                 0);
 
       if (ret == ESP_OK && size_ret == CONV_FRAME_SIZE) {
+        battery_reading = 0;
         for (int j = 0; j < PACKET_LEN; j++) {
           chords_packet[j][0] = counter;
           counter++;
@@ -264,6 +267,8 @@ adc_conv_task(void *arg) { // changed signature to proper FreeRTOS prototype
 }
 
 void app_main(void) {
+  neopixel_init();
+  set_pixel(0, RED, 10);
   /*
    * NVS flash initialization
    * Dependency of BLE stack to store configurations

@@ -25,6 +25,7 @@
 #include "gap.h"
 #include "common.h"
 #include "gatt.h"
+#include "neopixel.h"
 #include <stdint.h>
 
 static const char *TAG = "GAP";
@@ -144,8 +145,10 @@ static int gap_event_handler(struct ble_gap_event *event, void *arg) {
       // Restart advertising on error
       start_advertising();
     }
+    set_pixel(0, GREEN, 10);
     return rc;
   case BLE_GAP_EVENT_DISCONNECT:
+    set_pixel(0, RED, 10);
     ESP_LOGI(TAG, "Disconnected. Reason: %d", event->disconnect.reason);
     streaming = false; // Stop streaming when disconnected
     // Restart advertising
@@ -156,7 +159,6 @@ static int gap_event_handler(struct ble_gap_event *event, void *arg) {
     start_advertising();
     return rc;
   case BLE_GAP_EVENT_SUBSCRIBE:
-    ESP_LOGI(TAG, "got subscription event!!!!");
     if (event->subscribe.attr_handle == data_char_handle) {
       ESP_LOGI(TAG, "Data Characteristic Subscribe: Notify=%d, Indicate=%d",
                event->subscribe.cur_notify, event->subscribe.cur_indicate);

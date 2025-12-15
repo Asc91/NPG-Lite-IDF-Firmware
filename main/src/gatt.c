@@ -21,12 +21,12 @@
 //
 // Reference:
 // https://github.com/espressif/esp-idf/blob/master/examples/bluetooth/ble_get_started/nimble/NimBLE_GATT_Server/main/src/gatt_svc.c
-
 #include "gatt.h"
 #include "common.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "gap.h"
+#include "neopixel.h"
 #include <ctype.h>
 #include <string.h>
 
@@ -132,11 +132,13 @@ int gatt_svr_chr_access_cb(uint16_t conn_handle, uint16_t attr_handle,
     bool notify_response = true;
     if (strncmp(cmd_buffer, "START", 5) == 0) {
       streaming = true;
+      set_pixel(0, BLUE, 10);
       // Ensure ADC is running and cleared
       response = "RUNNING";
       ESP_LOGI(TAG, "Command: START received, streaming started.");
     } else if (strncmp(cmd_buffer, "STOP", 4) == 0) {
       streaming = false;
+      set_pixel(0, GREEN, 10);
       response = "STOPPED";
       ESP_LOGI(TAG, "Command: STOP received, streaming stopped.");
     } else if (strncmp(cmd_buffer, "WHORU", 5) == 0) {
