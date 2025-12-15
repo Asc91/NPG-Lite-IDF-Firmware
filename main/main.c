@@ -163,7 +163,9 @@ const uint8_t batt_table_len = sizeof(batt_table) / sizeof(batt_table[0]);
 
 void battery_check(int battery_reading) {
   float voltage = (battery_reading / 4095.0) * 3.3 - 0.14;
-  ESP_LOGI("debug", "vol bat: %f", voltage);
+#ifdef DEBUG
+  ESP_LOGI("NPG-IDF", "vol bat: %f", voltage);
+#endif
   uint8_t percent = 0;
   if (voltage < batt_table[0].voltage)
     percent = batt_table[0].percent;
@@ -250,7 +252,7 @@ adc_conv_task(void *arg) { // changed signature to proper FreeRTOS prototype
 #endif
 
       } else {
-        ESP_LOGD("adc_conv_task", "Corrupted reading from adc, size_ret:%d",
+        ESP_LOGE("adc_conv_task", "Corrupted reading from adc, size_ret:%d",
                  size_ret);
       }
 #ifdef DEBUG
@@ -266,6 +268,11 @@ void app_main(void) {
    * NVS flash initialization
    * Dependency of BLE stack to store configurations
    */
+#ifdef DEBUG
+  esp_log_level_set("*", ESP_LOG_DEBUG);
+#else
+  esp_log_level_set("*", ESP_LOG_ERROR);
+#endif
   int rc = 0;
   esp_err_t ret = nvs_flash_init();
   if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
